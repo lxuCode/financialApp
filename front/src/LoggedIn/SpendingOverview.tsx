@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 
-import axios, { AxiosError } from "axios";
 import {
 	Box,
 	Button,
@@ -13,14 +12,14 @@ import {
 	Grid,
 	TextField,
 	Typography,
-	Snackbar,
 	Alert,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 
 import CategoryCard from "./CategoryCard";
-import { getCategories } from "../services/categories";
+import { addCategory, getCategories } from "../services/categories";
 import { useNavigate } from "react-router";
+import CustomSnackbar from "../components/CustomSnackbar";
 
 const styles = {
 	root: {
@@ -51,17 +50,36 @@ const SpendingOverview = () => {
 		(state: { user: { user: String } }) => state.user.user
 	);
 
+	const initialSnackbar = {
+		open: false,
+		severity: "warning",
+		message: "",
+	};
+
+	const snackbarReducer = (state, action) => {
+		const { type, payload } = action;
+
+		switch (type) {
+			case "UPDATE_ALL":
+				return { ...state, ...payload };
+			case "UPDATE_OPEN":
+				return { ...state, open: payload };
+			case "UPDATE_SEVERITY":
+				return { ...state, severity: payload };
+			case "UPDATE_MESSAGE":
+				return { ...state, message: payload };
+			default:
+				return { ...state };
+		}
+	};
+
 	const [openDialog, setOpenDialog] = useState(false);
 	const [categoryName, setCategoryName] = useState("");
 	const [categories, setCategories] = useState<Array<CategoryProps>>([]);
-	const [openCategorySubmitSuccess, setOpenCategorySubmitSuccess] = useState(
-		false
+	const [snackbar, dispatchSnackbar] = useReducer(
+		snackbarReducer,
+		initialSnackbar
 	);
-	const [openCategorySubmitFailed, setOpenCategorySubmitFailed] = useState(
-		false
-	);
-	const [snackbarMessage, setSnackbarMessage] = useState<String>("");
-
 	const navigate = useNavigate();
 
 	const fetchCategories = async () => {
@@ -91,30 +109,34 @@ const SpendingOverview = () => {
 			categoryName: categoryName,
 		};
 		try {
-			const res = await axios.post(
-				"http://localhost:5000/categories",
-				newCategory,
-				{
-					withCredentials: true,
-				}
-			);
-			handleCloseDialog();
-			setSnackbarMessage(res.data);
-			setOpenCategorySubmitSuccess(true);
+			const res = await addCategory(newCategory);
+			dispatchSnackbar({
+				type: "UPDATE_ALL",
+				payload: {
+					open: true,
+					severity: "success",
+					message: res.data,
+				},
+			});
+
 			fetchCategories();
 		} catch (error: any | unknown) {
-			setSnackbarMessage(error.response.data);
-			setOpenCategorySubmitFailed(true);
+			dispatchSnackbar({
+				type: "UPDATE_ALL",
+				payload: {
+					open: true,
+					severity: "warning",
+					message: error.response.data,
+				},
+			});
+		} finally {
 			handleCloseDialog();
+			setCategoryName("");
 		}
 	};
 
-	const handleCloseSnackbarSuccess = () => {
-		setOpenCategorySubmitSuccess(false);
-	};
-
-	const handleCloseSnackbarFailed = () => {
-		setOpenCategorySubmitFailed(false);
+	const onCloseSnackbar = () => {
+		dispatchSnackbar({ type: "UPDATE_OPEN", payload: false });
 	};
 
 	return (
@@ -163,28 +185,10 @@ const SpendingOverview = () => {
 						</Button>
 					</DialogActions>
 				</Dialog>
-				<Snackbar
-					data-cy="snackbar-success"
-					anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-					open={openCategorySubmitSuccess}
-					autoHideDuration={5000}
-					onClose={handleCloseSnackbarSuccess}
-				>
-					<Alert data-cy="alert-success" onClose={() => {}} severity="success">
-						{snackbarMessage}
-					</Alert>
-				</Snackbar>
-				<Snackbar
-					data-cy="snackbar-failed"
-					anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-					open={openCategorySubmitFailed}
-					autoHideDuration={5000}
-					onClose={handleCloseSnackbarFailed}
-				>
-					<Alert data-cy="alert-failed" onClose={() => {}} severity="warning">
-						{snackbarMessage}
-					</Alert>
-				</Snackbar>
+
+				<CustomSnackbar open={snackbar.open} onClose={onCloseSnackbar}>
+					<Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+				</CustomSnackbar>
 			</Container>
 		</Box>
 	);

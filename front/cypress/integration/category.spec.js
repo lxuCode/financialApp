@@ -5,7 +5,6 @@ import {
 
 describe("home", () => {
 	beforeEach(() => {
-		//login
 		cy.intercept(
 			"/categories/all/*",
 			{
@@ -14,7 +13,9 @@ describe("home", () => {
 			},
 			categoriesOriginal
 		).as("getCategories");
+
 		cy.visit("/");
+		//login
 		cy.get("[data-cy=username]").type("tester");
 		cy.get("[data-cy=password]").type("tester");
 		cy.get("button").contains("Se connecter").should("be.enabled").click();
@@ -37,13 +38,15 @@ describe("home", () => {
 		cy.get("button").contains("Nouvelle catégorie").click();
 		cy.get("[data-cy=new-category-name]").type("Loisirs");
 		cy.get("button").contains("Soumettre").click();
-		cy.wait("@getCategories").then((interception) => "ok");
-		cy.get("[data-cy=snackbar-success]").within(() => {
-			cy.get("[data-cy=alert-success]").contains(
-				"La catégorie a bien été créée."
-			);
+
+		cy.wait("@getCategories");
+
+		// snackbar appears
+		cy.get(".MuiSnackbar-root").within(() => {
+			cy.get(".MuiAlert-message").contains("La catégorie a bien été créée.");
 		});
 
+		// newly created category appears
 		cy.get(".MuiGrid-container").within(() => {
 			cy.get(".MuiPaper-root")
 				.should("have.length", 3)
@@ -63,21 +66,17 @@ describe("home", () => {
 			statusCode: 400,
 			body: "La catégorie existe déjà.",
 		});
-		cy.intercept(
-			"/categories/all/*",
-			{
-				method: "GET",
-				times: 1,
-			},
-			categoriesOriginal
-		);
+
 		cy.get("button").contains("Nouvelle catégorie").click();
 		cy.get("[data-cy=new-category-name]").type("Loyer");
 		cy.get("button").contains("Soumettre").click();
-		cy.get("[data-cy=snackbar-failed]").within(() => {
-			cy.get("[data-cy=alert-failed]").contains("La catégorie existe déjà.");
+
+		// snackbar appears
+		cy.get(".MuiSnackbar-root").within(() => {
+			cy.get(".MuiAlert-message").contains("La catégorie existe déjà.");
 		});
 
+		// category is not created
 		cy.get(".MuiGrid-container").within(() => {
 			cy.get(".MuiPaper-root")
 				.should("have.length", 2)

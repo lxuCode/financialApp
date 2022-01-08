@@ -10,8 +10,13 @@ import {
 	TableHead,
 	TableRow,
 } from "@mui/material";
+import { useDispatch } from "react-redux";
 
-const CustomTable = ({ columns, data, spendingData }) => {
+import { updateSpending } from "../redux/features/spending";
+
+const CustomTable = ({ columns, data }) => {
+	const dispatch = useDispatch();
+
 	const {
 		getTableProps,
 		getTableBodyProps,
@@ -45,8 +50,11 @@ const CustomTable = ({ columns, data, spendingData }) => {
 							<TableRow
 								hover
 								{...row.getRowProps()}
-								onClick={() =>
-									spendingData({ type: "UPDATE_ALL", payload: row.original })
+								onClick={
+									() => {
+										dispatch(updateSpending(row.original));
+									}
+									//spendingData({ type: "UPDATE_ALL", payload: row.original })
 								}
 							>
 								{row.cells.map((cell) => {

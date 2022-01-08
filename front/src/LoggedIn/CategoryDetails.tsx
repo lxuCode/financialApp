@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
 	Box,
@@ -9,21 +9,15 @@ import {
 	DialogContent,
 	DialogContentText,
 	DialogTitle,
-	Stack,
-	TextField,
 	Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useParams } from "react-router";
 
-import {
-	deleteSpending,
-	getSpendings,
-	updateSpending,
-} from "../services/spendings";
+import { deleteSpending, getSpendings } from "../services/spendings";
 import CustomTable from "../components/CustomTable";
-import { materialUiDateInput } from "../helpers/date";
+import EditDialog from "./EditDialog";
 
 const styles = {
 	root: {
@@ -102,38 +96,6 @@ const CategoryDetails = () => {
 	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 	const [spendingId, setSpendingId] = useState(null);
 
-	const editSpendingInitialState = {
-		categoryId: "",
-		date: materialUiDateInput(new Date()),
-		name: "",
-		amount: null,
-		comment: "",
-	};
-
-	const editSpendingReducer = (state, action) => {
-		switch (action.type) {
-			case "UPDATE_CATEGORY":
-				return { ...state, categoryId: action.payload };
-			case "UPDATE_DATE":
-				return { ...state, date: action.payload };
-			case "UPDATE_NAME":
-				return { ...state, name: action.payload };
-			case "UPDATE_AMOUNT":
-				return { ...state, amount: action.payload };
-			case "UPDATE_COMMENT":
-				return { ...state, comment: action.payload };
-			case "UPDATE_ALL":
-				return { ...action.payload };
-			default:
-				return state;
-		}
-	};
-
-	const [editSpending, dispatchEditSpending] = useReducer(
-		editSpendingReducer,
-		editSpendingInitialState
-	);
-
 	const fetchSpendings = async () => {
 		const spendings = await getSpendings(categoryId);
 		setSpendings(spendings);
@@ -150,18 +112,10 @@ const CategoryDetails = () => {
 		setOpenEditDialog(true);
 	};
 
-	const handleCloseEditDialog = () => {
+	const handleCloseEditDialog = async () => {
 		setOpenEditDialog(false);
-	};
-
-	const handleEdit = async () => {
-		try {
-			const res = await updateSpending(editSpending);
-			await fetchSpendings();
-			handleCloseEditDialog();
-		} catch (error) {
-			console.log(error);
-		}
+		//can be optimized
+		await fetchSpendings();
 	};
 
 	const handleOpenDeleteDialog = () => {
@@ -191,11 +145,7 @@ const CategoryDetails = () => {
 				{spendings.length === 0 ? (
 					<Typography>Il n'y a pas de dépense pour cette catégorie.</Typography>
 				) : (
-					<CustomTable
-						columns={columns}
-						data={data}
-						spendingData={dispatchEditSpending}
-					/>
+					<CustomTable columns={columns} data={data} />
 				)}
 				<Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
 					<DialogTitle>Supprimer la dépense</DialogTitle>
@@ -209,60 +159,12 @@ const CategoryDetails = () => {
 						<Button onClick={handleDelete}>Supprimer</Button>
 					</DialogActions>
 				</Dialog>
-				<Dialog open={openEditDialog} onClose={handleCloseEditDialog} fullWidth>
-					<DialogTitle>Modifier la dépense</DialogTitle>
-					<DialogContent>
-						<Stack spacing={2}>
-							<TextField
-								variant="outlined"
-								size="small"
-								label="Nom"
-								fullWidth
-								value={editSpending?.name}
-								margin="dense"
-								onChange={(event) => {
-									dispatchEditSpending({
-										type: "UPDATE_NAME",
-										payload: event?.target.value,
-									});
-								}}
-							/>
-							<TextField
-								variant="outlined"
-								size="small"
-								label="Montant"
-								fullWidth
-								value={editSpending?.amount}
-								margin="dense"
-								type="number"
-								onChange={(event) =>
-									dispatchEditSpending({
-										type: "UPDATE_AMOUNT",
-										payload: event.target.value,
-									})
-								}
-							/>
-							<TextField
-								variant="outlined"
-								size="small"
-								label="Commentaire"
-								fullWidth
-								value={editSpending?.comment}
-								margin="dense"
-								onChange={(event) => {
-									dispatchEditSpending({
-										type: "UPDATE_COMMENT",
-										payload: event.target.value,
-									});
-								}}
-							/>
-						</Stack>
-					</DialogContent>
-					<DialogActions>
-						<Button onClick={handleCloseEditDialog}>Annuler</Button>
-						<Button onClick={handleEdit}>Modifier</Button>
-					</DialogActions>
-				</Dialog>
+
+				{openEditDialog ? (
+					<EditDialog handleClose={handleCloseEditDialog} />
+				) : (
+					<></>
+				)}
 			</Container>
 		</Box>
 	);

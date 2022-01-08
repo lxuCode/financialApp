@@ -13,4 +13,16 @@ const getCategories = async (username) => {
 	}
 };
 
-export { getCategories };
+const addCategory = async (newCategory) => {
+	const res = await axios.post(
+		"http://localhost:5000/categories",
+		newCategory,
+		{
+			withCredentials: true,
+		}
+	);
+
+	return res;
+};
+
+export { addCategory, getCategories };

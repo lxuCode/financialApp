@@ -3,9 +3,11 @@ import createSagaMiddleware from "@redux-saga/core";
 
 import { watcherSaga } from "./sagas/rootSaga";
 import userReducer from "./features/user";
+import spendingReducer from "./features/spending";
 
 const rootReducer = combineReducers({
 	user: userReducer,
+	spending: spendingReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();
