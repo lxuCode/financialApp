@@ -46,36 +46,15 @@ router.post("/", validateToken, async (req, res) => {
 		console.log(category);
 		if (category) {
 			res.status(409).json("La catégorie existe déjà.");
-		}
-
-		const newCategory = new Category({
-			name: categoryName,
-			owner: username,
-		});
-		await newCategory.save();
-
-		res.status(200).json("La catégorie a bien été créée.");
-	} catch (error) {
-		console.log(error);
-		res.status(500).json("An error occured ...");
-	}
-});
-
-//todo
-router.patch("/:categoryName/:username", async (req, res) => {
-	try {
-		const { userId, categoryName } = req.body;
-		const user = await User.findById(userId);
-		console.log(user.categories);
-		if (!user.categories.includes(categoryName)) {
-			console.log("in");
-			await user.updateOne({
-				$push: { categories: categoryName },
+		} else {
+			const newCategory = new Category({
+				name: categoryName,
+				owner: username,
 			});
-		}
-		console.log(user);
+			await newCategory.save();
 
-		res.status(200).send(true);
+			res.status(200).json("La catégorie a bien été créée.");
+		}
 	} catch (error) {
 		console.log(error);
 		res.status(500).json("An error occured ...");
