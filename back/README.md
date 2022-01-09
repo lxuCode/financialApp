@@ -14,7 +14,7 @@
 
 In the project directory, you can run:
 
-### `npm start`
+### `npm start-dev`
 
 The app will connect to development database.
 
