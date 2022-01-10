@@ -37,7 +37,6 @@ const sidebarItems: Array<SidebarItem> = [
 	{ text: "Accueil", path: "/", icon: <HomeIcon /> },
 	{ text: "Créer un compte", path: "/signup", icon: <CreateIcon /> },
 	{ text: "FAQ", path: "/FAQ", icon: <HelpIcon /> },
-	{ text: "Mes dépenses annuelles", path: "/FAQ", icon: <HelpIcon /> },
 	// { text: "Contact", icon: <InfoIcon /> },
 ];
 

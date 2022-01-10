@@ -22,7 +22,7 @@ const addCategory = async (newCategory) => {
 		}
 	);
 
-	return res;
+	return res.data;
 };
 
 export { addCategory, getCategories };

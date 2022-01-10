@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React from "react";
 
 import {
 	Button,
@@ -9,14 +9,18 @@ import {
 	Stack,
 	TextField,
 } from "@mui/material";
-
-import { updateSpending } from "../services/spendings";
 import { useDispatch, useSelector } from "react-redux";
+
+import { updateSpending } from "../../services/spendings";
 import {
 	updateSpendingAmount,
 	updateSpendingComment,
 	updateSpendingName,
-} from "../redux/features/spending";
+} from "../../redux/features/spending";
+import {
+	openSuccessSnackbar,
+	openWarningSnackbar,
+} from "../../redux/features/snackbar";
 
 const EditDialog = ({ handleClose }) => {
 	const spending = useSelector(
@@ -26,10 +30,12 @@ const EditDialog = ({ handleClose }) => {
 
 	const dispatch = useDispatch();
 
-	const edit = async () => {
+	const handleEdit = async () => {
 		try {
 			const res = await updateSpending(spending);
+			dispatch(openSuccessSnackbar(res));
 		} catch (error) {
+			dispatch(openWarningSnackbar(error));
 			console.log(error);
 		} finally {
 			handleClose();
@@ -79,7 +85,7 @@ const EditDialog = ({ handleClose }) => {
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={handleClose}>Annuler</Button>
-				<Button onClick={edit}>Modifier</Button>
+				<Button onClick={handleEdit}>Modifier</Button>
 			</DialogActions>
 		</Dialog>
 	);

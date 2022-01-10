@@ -1,4 +1,4 @@
-import CategoryDetails from "../LoggedIn/CategoryDetails";
+import CategoryDetails from "../LoggedIn/categoryDetails/CategoryDetails";
 import SpendingForm from "../LoggedIn/SpendingForm";
 import SpendingOverview from "../LoggedIn/SpendingOverview";
 import Home from "../LoggedOut/Home";

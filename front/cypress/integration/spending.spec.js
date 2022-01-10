@@ -38,10 +38,8 @@ describe("Spending", () => {
 		cy.get("[data-cy=spending-amount]").type("50");
 		cy.get("button").contains("Ajouter").click();
 
-		cy.get("[data-cy=snackbar-success]").within(() => {
-			cy.get("[data-cy=alert-success]").contains(
-				"La dépense a bien été ajoutée."
-			);
+		cy.get(".MuiSnackbar-root").within(() => {
+			cy.get(".MuiAlert-message").contains("La dépense a bien été ajoutée.");
 		});
 	});
 });

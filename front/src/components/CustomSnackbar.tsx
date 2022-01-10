@@ -1,13 +1,21 @@
 import React from "react";
 
-import { Alert, Snackbar } from "@mui/material";
+import { Snackbar } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { closeSnackbar } from "../redux/features/snackbar";
 
-const CustomSnackbar = ({ open, onClose, children }) => {
+const CustomSnackbar = ({ open, children }) => {
+	const dispatch = useDispatch();
+
+	const handleClose = () => {
+		dispatch(closeSnackbar());
+	};
+
 	return (
 		<Snackbar
 			anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
 			open={open}
-			onClose={onClose}
+			onClose={handleClose}
 			autoHideDuration={5000}
 		>
 			{children}

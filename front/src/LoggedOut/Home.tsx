@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useReducer, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import {
@@ -10,7 +10,6 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/features/user";
 

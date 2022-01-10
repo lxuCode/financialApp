@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
 	Box,
@@ -13,13 +13,18 @@ import {
 	TextField,
 	Typography,
 	Alert,
+	AlertColor,
 } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import CategoryCard from "./CategoryCard";
 import { addCategory, getCategories } from "../services/categories";
 import { useNavigate } from "react-router";
 import CustomSnackbar from "../components/CustomSnackbar";
+import {
+	openSuccessSnackbar,
+	openWarningSnackbar,
+} from "../redux/features/snackbar";
 
 const styles = {
 	root: {
@@ -50,36 +55,18 @@ const SpendingOverview = () => {
 		(state: { user: { user: String } }) => state.user.user
 	);
 
-	const initialSnackbar = {
-		open: false,
-		severity: "warning",
-		message: "",
-	};
+	const snackbar = useSelector(
+		(store: {
+			snackbar: { isOpen: boolean; severity: AlertColor; message: string };
+		}) => store.snackbar
+	);
 
-	const snackbarReducer = (state, action) => {
-		const { type, payload } = action;
-
-		switch (type) {
-			case "UPDATE_ALL":
-				return { ...state, ...payload };
-			case "UPDATE_OPEN":
-				return { ...state, open: payload };
-			case "UPDATE_SEVERITY":
-				return { ...state, severity: payload };
-			case "UPDATE_MESSAGE":
-				return { ...state, message: payload };
-			default:
-				return { ...state };
-		}
-	};
+	const dispatch = useDispatch();
 
 	const [openDialog, setOpenDialog] = useState(false);
 	const [categoryName, setCategoryName] = useState("");
 	const [categories, setCategories] = useState<Array<CategoryProps>>([]);
-	const [snackbar, dispatchSnackbar] = useReducer(
-		snackbarReducer,
-		initialSnackbar
-	);
+
 	const navigate = useNavigate();
 
 	const fetchCategories = async () => {
@@ -110,33 +97,14 @@ const SpendingOverview = () => {
 		};
 		try {
 			const res = await addCategory(newCategory);
-			dispatchSnackbar({
-				type: "UPDATE_ALL",
-				payload: {
-					open: true,
-					severity: "success",
-					message: res.data,
-				},
-			});
-
-			fetchCategories();
+			dispatch(openSuccessSnackbar(res));
+			await fetchCategories();
 		} catch (error: any | unknown) {
-			dispatchSnackbar({
-				type: "UPDATE_ALL",
-				payload: {
-					open: true,
-					severity: "warning",
-					message: error.response.data,
-				},
-			});
+			dispatch(openWarningSnackbar(error.response.data));
 		} finally {
 			handleCloseDialog();
 			setCategoryName("");
 		}
-	};
-
-	const onCloseSnackbar = () => {
-		dispatchSnackbar({ type: "UPDATE_OPEN", payload: false });
 	};
 
 	return (
@@ -186,7 +154,7 @@ const SpendingOverview = () => {
 					</DialogActions>
 				</Dialog>
 
-				<CustomSnackbar open={snackbar.open} onClose={onCloseSnackbar}>
+				<CustomSnackbar open={snackbar.isOpen}>
 					<Alert severity={snackbar.severity}>{snackbar.message}</Alert>
 				</CustomSnackbar>
 			</Container>

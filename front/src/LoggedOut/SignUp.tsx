@@ -12,6 +12,13 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import {
+	openSuccessSnackbar,
+	openWarningSnackbar,
+} from "../redux/features/snackbar";
+import CustomSnackbar from "../components/CustomSnackbar";
+import { register } from "../services/user";
 
 const SignUp = () => {
 	const userRegisterInfoReducer = (state, action) => {
@@ -47,40 +54,20 @@ const SignUp = () => {
 		initialStateUserRegisterInfo
 	);
 
-	const [snackbar, setSnackbar] = useState<{
-		open: boolean;
-		severity: AlertColor | undefined;
-		message: string;
-	}>({
-		open: false,
-		severity: undefined,
-		message: "",
-	});
+	const dispatch = useDispatch();
+	const snackbar = useSelector(
+		(store: {
+			snackbar: { isOpen: boolean; severity: AlertColor; message: string };
+		}) => store.snackbar
+	);
 
 	const handleSubmit = async (): Promise<void> => {
 		try {
-			const res = await axios.post(
-				"http://localhost:5000/users/register",
-				userRegisterInfo
-			);
-			if (res) {
-				setSnackbar({
-					open: true,
-					severity: "success",
-					message: "Votre compte a bien été crée !",
-				});
-			}
+			const res = await register(userRegisterInfo);
+			dispatch(openSuccessSnackbar(res));
 		} catch (err) {
-			setSnackbar({
-				open: true,
-				severity: "error",
-				message: "Une erreur est survenue, veuillez réessayer.",
-			});
+			dispatch(openWarningSnackbar());
 		}
-	};
-
-	const handleCloseSnackbar = (): void => {
-		setSnackbar({ ...snackbar, open: false });
 	};
 
 	return (
@@ -131,16 +118,9 @@ const SignUp = () => {
 					</Button>
 				</Stack>
 			</Container>
-			<Snackbar
-				anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-				open={snackbar.open}
-				autoHideDuration={5000}
-				onClose={handleCloseSnackbar}
-			>
-				<Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
-					{snackbar.message}
-				</Alert>
-			</Snackbar>
+			<CustomSnackbar open={snackbar.isOpen}>
+				<Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+			</CustomSnackbar>
 		</>
 	);
 };

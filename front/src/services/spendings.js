@@ -1,5 +1,12 @@
 import axios from "axios";
 
+const addSpending = async (newSpending) => {
+	const res = await axios.post("http://localhost:5000/spendings", newSpending, {
+		withCredentials: true,
+	});
+
+	return res.data;
+};
 const getSpendings = async (categoryId) => {
 	try {
 		const res = await axios.get(
@@ -43,4 +50,4 @@ const deleteSpending = async (spendingId) => {
 	}
 };
 
-export { getSpendings, deleteSpending, updateSpending };
+export { addSpending, getSpendings, deleteSpending, updateSpending };

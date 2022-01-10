@@ -2,21 +2,27 @@ import React, { useEffect, useReducer, useState } from "react";
 
 import {
 	Alert,
+	AlertColor,
 	Box,
 	Button,
 	Container,
 	FormControl,
 	MenuItem,
-	Snackbar,
 	Stack,
 	TextField,
 	Typography,
 } from "@mui/material";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import CustomSnackbar from "../components/CustomSnackbar";
 import { materialUiDateInput } from "../helpers/date";
 import { getCategories } from "../services/categories";
-import axios from "axios";
+import { addSpending } from "../services/spendings";
+import {
+	openSuccessSnackbar,
+	openWarningSnackbar,
+} from "../redux/features/snackbar";
 
 const styles = {
 	root: {
@@ -73,10 +79,14 @@ const SpendingForm = () => {
 	const username = useSelector(
 		(state: { user: { user: string } }) => state.user.user
 	);
+	const snackbar = useSelector(
+		(store: {
+			snackbar: { isOpen: boolean; severity: AlertColor; message: string };
+		}) => store.snackbar
+	);
+	const dispatch = useDispatch();
+
 	const [categories, setCategories] = useState<Array<CategoryProps>>([]);
-	const [openSubmitSuccess, setOpenSubmitSuccess] = useState<boolean>(false);
-	const [openSubmitFailed, setOpenSubmitFailed] = useState<boolean>(false);
-	const [snackbarMessage, setSnackbarMessage] = useState<String>("");
 
 	useEffect(() => {
 		const fetchCategories = async () => {
@@ -88,28 +98,11 @@ const SpendingForm = () => {
 
 	const handleSubmit = async () => {
 		try {
-			const res = await axios.post(
-				"http://localhost:5000/spendings",
-				newSpending,
-				{
-					withCredentials: true,
-				}
-			);
-			setSnackbarMessage(res.data);
-			setOpenSubmitSuccess(true);
+			const res = await addSpending(newSpending);
+			dispatch(openSuccessSnackbar(res));
 		} catch (error: any | unknown) {
-			setSnackbarMessage(error.response.data);
-			setOpenSubmitFailed(true);
-			console.log(error);
+			dispatch(openWarningSnackbar(error.response.data));
 		}
-	};
-
-	const handleCloseSnackbarSuccess = () => {
-		setOpenSubmitSuccess(false);
-	};
-
-	const handleCloseSnackbarFailed = () => {
-		setOpenSubmitFailed(false);
 	};
 
 	return (
@@ -224,36 +217,9 @@ const SpendingForm = () => {
 							Ajouter
 						</Button>
 					</Stack>
-					<Snackbar
-						data-cy="snackbar-success"
-						anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-						open={openSubmitSuccess}
-						autoHideDuration={5000}
-						onClose={handleCloseSnackbarSuccess}
-					>
-						<Alert
-							data-cy="alert-success"
-							onClose={handleCloseSnackbarSuccess}
-							severity="success"
-						>
-							{snackbarMessage}
-						</Alert>
-					</Snackbar>
-					<Snackbar
-						data-cy="snackbar-failed"
-						anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-						open={openSubmitFailed}
-						autoHideDuration={5000}
-						onClose={handleCloseSnackbarFailed}
-					>
-						<Alert
-							data-cy="alert-failed"
-							onClose={handleCloseSnackbarFailed}
-							severity="error"
-						>
-							Une erreur est survenue. La dépense n'a pas été enregistrée.
-						</Alert>
-					</Snackbar>
+					<CustomSnackbar open={snackbar.isOpen}>
+						<Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+					</CustomSnackbar>
 				</Container>
 			</Box>
 		)

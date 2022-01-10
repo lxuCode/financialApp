@@ -11,7 +11,7 @@ router.post("/register", async (req, res) => {
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const newUser = new User({ username, email, password: hashedPassword });
 		await newUser.save();
-		res.status(200).send(true);
+		res.status(200).json("Votre compte a bien été créé.");
 	} catch (err) {
 		res.status(500).json("An error occured ...");
 	}

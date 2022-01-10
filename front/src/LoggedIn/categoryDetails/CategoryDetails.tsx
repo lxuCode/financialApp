@@ -1,23 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 
 import {
+	Alert,
+	AlertColor,
 	Box,
 	Button,
 	Container,
-	Dialog,
-	DialogActions,
-	DialogContent,
-	DialogContentText,
-	DialogTitle,
 	Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useParams } from "react-router";
+import { useSelector } from "react-redux";
 
-import { deleteSpending, getSpendings } from "../services/spendings";
-import CustomTable from "../components/CustomTable";
+import { getSpendings } from "../../services/spendings";
+import CustomTable from "../../components/CustomTable";
 import EditDialog from "./EditDialog";
+import CustomSnackbar from "../../components/CustomSnackbar";
+import DeleteDialog from "./DeleteDialog";
 
 const styles = {
 	root: {
@@ -32,9 +32,6 @@ const styles = {
 	title: {
 		textAlign: "center",
 		marginBottom: 3,
-	},
-	dialogStack: {
-		width: "100%",
 	},
 } as const;
 
@@ -90,6 +87,13 @@ const CategoryDetails = () => {
 			),
 		},
 	];
+
+	const snackbar = useSelector(
+		(store: {
+			snackbar: { isOpen: boolean; severity: AlertColor; message: string };
+		}) => store.snackbar
+	);
+
 	const { categoryId } = useParams();
 	const [spendings, setSpendings] = useState<SpendingProps[]>([]);
 	const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -122,18 +126,9 @@ const CategoryDetails = () => {
 		setOpenDeleteDialog(true);
 	};
 
-	const handleCloseDeleteDialog = () => {
+	const handleCloseDeleteDialog = async () => {
 		setOpenDeleteDialog(false);
-	};
-
-	const handleDelete = async () => {
-		try {
-			const res = await deleteSpending(spendingId);
-			await fetchSpendings();
-			handleCloseDeleteDialog();
-		} catch (error) {
-			console.log(error);
-		}
+		await fetchSpendings();
 	};
 
 	return (
@@ -147,24 +142,25 @@ const CategoryDetails = () => {
 				) : (
 					<CustomTable columns={columns} data={data} />
 				)}
-				<Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-					<DialogTitle>Supprimer la dépense</DialogTitle>
-					<DialogContent>
-						<DialogContentText>
-							Veuillez confirmer la suppression de la dépense.
-						</DialogContentText>
-					</DialogContent>
-					<DialogActions>
-						<Button onClick={handleCloseDeleteDialog}>Annuler</Button>
-						<Button onClick={handleDelete}>Supprimer</Button>
-					</DialogActions>
-				</Dialog>
 
 				{openEditDialog ? (
 					<EditDialog handleClose={handleCloseEditDialog} />
 				) : (
 					<></>
 				)}
+
+				{openDeleteDialog ? (
+					<DeleteDialog
+						handleClose={handleCloseDeleteDialog}
+						spendingId={spendingId}
+					/>
+				) : (
+					<></>
+				)}
+
+				<CustomSnackbar open={snackbar.isOpen}>
+					<Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+				</CustomSnackbar>
 			</Container>
 		</Box>
 	);
