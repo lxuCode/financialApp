@@ -5,6 +5,10 @@ const CategorySchema = mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	objective: {
+		type: Number,
+		default: 200,
+	},
 	isActive: {
 		type: Boolean,
 		default: true,

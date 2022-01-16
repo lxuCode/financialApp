@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar";
 const styles = {
 	layout: {
 		display: "flex",
-		backgroundColor: "#fcfcfc",
+		backgroundColor: "#f8f8f8",
 	},
 	left: {
 		flex: 2.2,

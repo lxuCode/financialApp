@@ -1,19 +1,19 @@
-import CategoryDetails from "../LoggedIn/categoryDetails/CategoryDetails";
-import SpendingForm from "../LoggedIn/SpendingForm";
-import SpendingOverview from "../LoggedIn/SpendingOverview";
-import Home from "../LoggedOut/Home";
-import Login from "../LoggedOut/Login";
-import SignUp from "../LoggedOut/SignUp";
+import CategoryDetails from "../pages/private/categoryDetails";
+import Dashboard from "../pages/private/dashboard";
+import NewCategory from "../pages/private/newCategory";
+import NewSpending from "../pages/private/newSpending";
+import Home from "../pages/public/home";
+import Register from "../pages/public/register";
 
 const appPublicRoutes = [
 	{ path: "/", element: <Home /> },
-	{ path: "/login", element: <Login /> },
-	{ path: "/signup", element: <SignUp /> },
+	{ path: "/register", element: <Register /> },
 ];
 
 const appPrivateRoutes = [
-	{ path: "/myAccount", element: <SpendingOverview /> },
-	{ path: "/nouvelle-depense", element: <SpendingForm /> },
+	{ path: "/myAccount", element: <Dashboard /> },
+	{ path: "/nouvelle-depense", element: <NewSpending /> },
+	{ path: "/nouvelle-categorie", element: <NewCategory /> },
 	{ path: "/:categoryId/details", element: <CategoryDetails /> },
 ];
 

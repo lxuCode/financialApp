@@ -6,4 +6,16 @@ const register = async (newUser) => {
 	return res.data;
 };
 
-export { register };
+const logout = async () => {
+	const res = await axios.post(
+		"http://localhost:5000/users/logout",
+		{},
+		{
+			withCredentials: true,
+		}
+	);
+
+	return res;
+};
+
+export { logout, register };

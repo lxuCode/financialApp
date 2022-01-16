@@ -4,7 +4,7 @@ const router = express.Router();
 const Category = require("../models/Category");
 const { validateToken } = require("../utils/JWT");
 
-router.get("/all/:username", validateToken, async (req, res) => {
+router.get("/all", validateToken, async (req, res) => {
 	try {
 		const { username } = req.tokenPayload;
 		const categories = await Category.aggregate([
@@ -24,6 +24,7 @@ router.get("/all/:username", validateToken, async (req, res) => {
 			{
 				$project: {
 					name: 1,
+					objective: 1,
 					totalSpending: {
 						$sum: "$categories.amount",
 					},
@@ -39,16 +40,17 @@ router.get("/all/:username", validateToken, async (req, res) => {
 
 router.post("/", validateToken, async (req, res) => {
 	try {
-		const { categoryName } = req.body;
+		const { name, objective } = req.body;
 		const { username } = req.tokenPayload;
 
-		const category = await Category.findOne({ name: categoryName });
-		console.log(category);
+		const category = await Category.findOne({ name: name });
+		console.log(req.body);
 		if (category) {
 			res.status(409).json("La catégorie existe déjà.");
 		} else {
 			const newCategory = new Category({
-				name: categoryName,
+				name: name,
+				objective: !!objective ? objective : undefined,
 				owner: username,
 			});
 			await newCategory.save();

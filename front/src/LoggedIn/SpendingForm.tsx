@@ -90,7 +90,7 @@ const SpendingForm = () => {
 
 	useEffect(() => {
 		const fetchCategories = async () => {
-			const categories = await getCategories(username);
+			const categories = await getCategories();
 			setCategories(categories);
 		};
 		fetchCategories();

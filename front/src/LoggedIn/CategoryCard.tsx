@@ -15,9 +15,11 @@ interface ComponentProps {
 
 const styles = {
 	card: {
-		boxShadow: 3,
+		boxShadow: 0,
+		backgroundColor: "red",
+		border: "1px solid #f6f6f6",
 		":hover": {
-			boxShadow: 9,
+			boxShadow: 3,
 		},
 	},
 };

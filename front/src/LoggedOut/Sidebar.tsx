@@ -16,12 +16,16 @@ import HomeIcon from "@mui/icons-material/Home";
 const styles = {
 	root: {
 		height: "100vh",
-		backgroundColor: "yellowgreen",
+		backgroundColor: "#11192a",
 		overflow: "auto",
 	},
 	item: {
 		paddingTop: (theme: Theme) => theme.spacing(0),
 		paddingBottom: (theme: Theme) => theme.spacing(0),
+		color: "#e8e8e8",
+		"&:active": {
+			color: "black",
+		},
 	},
 	icon: {
 		marginRight: (theme: Theme) => theme.spacing(2),

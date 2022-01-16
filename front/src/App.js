@@ -19,7 +19,7 @@ function App() {
 					<Route
 						key={index}
 						path={publicRoute.path}
-						element={<LoggedOutLayout>{publicRoute.element}</LoggedOutLayout>}
+						element={publicRoute.element}
 					/>
 				))}
 				{/* handle private routes */}
@@ -27,11 +27,7 @@ function App() {
 					<Route
 						key={index}
 						path={privateRoute.path}
-						element={
-							<PrivateRoute>
-								<LoggedInLayout>{privateRoute.element}</LoggedInLayout>
-							</PrivateRoute>
-						}
+						element={<PrivateRoute>{privateRoute.element}</PrivateRoute>}
 					/>
 				))}
 				{/* handle unknown routes */}

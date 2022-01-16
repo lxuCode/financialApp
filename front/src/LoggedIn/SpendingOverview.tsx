@@ -51,6 +51,7 @@ interface CategoryProps {
 }
 
 const SpendingOverview = () => {
+	//not used
 	const username = useSelector(
 		(state: { user: { user: String } }) => state.user.user
 	);
@@ -70,7 +71,7 @@ const SpendingOverview = () => {
 	const navigate = useNavigate();
 
 	const fetchCategories = async () => {
-		const categories = await getCategories(username);
+		const categories = await getCategories();
 		setCategories(categories);
 	};
 

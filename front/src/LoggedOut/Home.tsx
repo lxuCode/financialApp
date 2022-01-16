@@ -91,6 +91,7 @@ const Home = () => {
 					}}
 				/>
 				<TextField
+					sx={{ backgroundColor: "white" }}
 					data-cy="password"
 					label="Password"
 					variant="outlined"
