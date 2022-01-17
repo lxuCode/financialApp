@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from "react";
+import React, { useContext, useReducer, useState } from "react";
 
 import { Box, Paper, TextField, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
@@ -6,7 +6,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import { updateSpending } from "../../../services/spendings";
+import { CategoryDetailsContext } from "./categoryDetailsContext";
 
 const styles = {
 	paper: {
@@ -52,8 +52,15 @@ const styles = {
 		marginLeft: "15px",
 	},
 };
-const SpendingPaper = ({ spending, isEditable, setIsEditable }) => {
+const SpendingPaper = ({
+	spending,
+	isEditable,
+	setIsEditable,
+	handleOpenDeleteDialog,
+	handleEdit,
+}) => {
 	const [editMode, setEditMode] = useState(false);
+	const { setSpendingId } = useContext(CategoryDetailsContext);
 
 	const spendingReducer = (state, action) => {
 		switch (action.type) {
@@ -76,23 +83,19 @@ const SpendingPaper = ({ spending, isEditable, setIsEditable }) => {
 		setIsEditable(false);
 	};
 
-	const handleEdit = async () => {
-		try {
-			const res = await updateSpending(spendingEdited);
-			// dispatch(openSuccessSnackbar(res));
-		} catch (error) {
-			// dispatch(openWarningSnackbar(error));
-			console.log(error);
-		} finally {
-			// handleClose();
-			setEditMode(false);
-			setIsEditable(true);
-		}
+	const handleEditClick = async () => {
+		handleEdit(spendingEdited);
+		setEditMode(false);
 	};
 
 	const handleUndo = () => {
 		setEditMode(false);
 		setIsEditable(true);
+	};
+
+	const handleDeleteClick = () => {
+		handleOpenDeleteDialog();
+		setSpendingId(spending._id);
 	};
 
 	return (
@@ -140,11 +143,14 @@ const SpendingPaper = ({ spending, isEditable, setIsEditable }) => {
 				{isEditable ? (
 					<>
 						<EditIcon onClick={handleEditMode} />
-						<DeleteIcon sx={styles.rightIcon} />
+						<DeleteIcon
+							onClick={() => handleDeleteClick()}
+							sx={styles.rightIcon}
+						/>
 					</>
 				) : editMode ? (
 					<>
-						<CheckIcon onClick={handleEdit} />
+						<CheckIcon onClick={handleEditClick} />
 						<ClearIcon sx={styles.rightIcon} onClick={handleUndo} />
 					</>
 				) : (
