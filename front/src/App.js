@@ -7,8 +7,6 @@ import {
 
 import { appPrivateRoutes, appPublicRoutes } from "./routing/routes";
 import PrivateRoute from "./routing/PrivateRoute";
-import LoggedInLayout from "./LoggedIn/LoggedInLayout";
-import LoggedOutLayout from "./LoggedOut/LoggedOutLayout";
 
 function App() {
 	return (
