@@ -12,6 +12,19 @@ const getCategories = async () => {
 	}
 };
 
+const getCategory = async (categoryId) => {
+	try {
+		const res = await axios.get(
+			`http://localhost:5000/categories/${categoryId}`,
+			{ withCredentials: true }
+		);
+
+		return res.data;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
 const addCategory = async (newCategory) => {
 	const res = await axios.post(
 		"http://localhost:5000/categories",
@@ -24,4 +37,4 @@ const addCategory = async (newCategory) => {
 	return res.data;
 };
 
-export { addCategory, getCategories };
+export { addCategory, getCategory, getCategories };

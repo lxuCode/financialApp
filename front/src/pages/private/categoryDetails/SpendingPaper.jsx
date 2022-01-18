@@ -16,7 +16,7 @@ const styles = {
 	left: {
 		display: "flex",
 		justifyContent: "space-between",
-		width: "90%",
+		width: "85%",
 	},
 	info: {
 		display: "flex",
@@ -116,6 +116,7 @@ const SpendingPaper = ({
 									payload: event.target.value,
 								});
 							}}
+							data-cy="spendingNewName"
 						/>
 					) : (
 						<span style={styles.name}>{spending.name}</span>
@@ -134,6 +135,7 @@ const SpendingPaper = ({
 								payload: event.target.value,
 							});
 						}}
+						data-cy="spendingNewAmount"
 					/>
 				) : (
 					<span style={styles.amount}>{spending.amount} €</span>
@@ -142,7 +144,7 @@ const SpendingPaper = ({
 			<Box sx={styles.icon}>
 				{isEditable ? (
 					<>
-						<EditIcon onClick={handleEditMode} />
+						<EditIcon onClick={handleEditMode} id="editIcon" />
 						<DeleteIcon
 							onClick={() => handleDeleteClick()}
 							sx={styles.rightIcon}
@@ -150,7 +152,7 @@ const SpendingPaper = ({
 					</>
 				) : editMode ? (
 					<>
-						<CheckIcon onClick={handleEditClick} />
+						<CheckIcon onClick={handleEditClick} id="confirmEditIcon" />
 						<ClearIcon sx={styles.rightIcon} onClick={handleUndo} />
 					</>
 				) : (

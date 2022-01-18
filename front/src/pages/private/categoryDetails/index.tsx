@@ -11,6 +11,7 @@ import {
 	getSpendings,
 	updateSpending,
 } from "../../../services/spendings";
+import { getCategory } from "../../../services/categories";
 import { CategoryDetailsContext } from "./categoryDetailsContext";
 import DeleteDialog from "./DeleteDialog";
 
@@ -41,13 +42,20 @@ const CategoryDetails = () => {
 	const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 	const [spendingId, setSpendingId] = useState(undefined);
 	const { categoryId } = useParams();
+	const [category, setCategory] = useState(undefined);
 
 	const fetchSpendings = async () => {
 		const spendings = await getSpendings(categoryId);
 		setSpendings(spendings);
 	};
 
+	const fetchCategory = async () => {
+		const categories = await getCategory(categoryId);
+		setCategory(categories);
+	};
+
 	useEffect(() => {
+		fetchCategory();
 		fetchSpendings();
 	}, []);
 
@@ -92,20 +100,23 @@ const CategoryDetails = () => {
 					<h2 style={styles.title}>Dépenses</h2>
 					<hr />
 					<Grid container sx={styles.content} spacing={3}>
-						<Grid item xs={12} sx={{ marginBottom: "50px" }}>
-							<CategoryPaper />
-						</Grid>
-						{spendings.map((spending, index) => (
-							<Grid item xs={12} key={index}>
-								<SpendingPaper
-									spending={spending}
-									isEditable={isEditable}
-									setIsEditable={setIsEditable}
-									handleOpenDeleteDialog={handleOpenDeleteDialog}
-									handleEdit={handleEdit}
-								/>
+						{category && (
+							<Grid item xs={12} sx={{ marginBottom: "50px" }}>
+								<CategoryPaper category={category} />
 							</Grid>
-						))}
+						)}
+						{spendings.length > 0 &&
+							spendings.map((spending, index) => (
+								<Grid item xs={12} key={index} className="categoryItem">
+									<SpendingPaper
+										spending={spending}
+										isEditable={isEditable}
+										setIsEditable={setIsEditable}
+										handleOpenDeleteDialog={handleOpenDeleteDialog}
+										handleEdit={handleEdit}
+									/>
+								</Grid>
+							))}
 					</Grid>
 					<DeleteDialog
 						open={openDeleteDialog}

@@ -1,6 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
+const mongoose = require("mongoose");
 const Category = require("../models/Category");
 const { validateToken } = require("../utils/JWT");
 
@@ -34,6 +35,42 @@ router.get("/all", validateToken, async (req, res) => {
 		res.status(200).json(categories);
 	} catch (error) {
 		console.log(error);
+		res.status(500).json("An error occured ...");
+	}
+});
+
+router.get("/:id", validateToken, async (req, res) => {
+	try {
+		const { id } = req.params;
+		console.log("get cat");
+		const ObjectId = mongoose.Types.ObjectId;
+		const category = await Category.aggregate([
+			{
+				$match: {
+					_id: ObjectId(id),
+				},
+			},
+			{
+				$lookup: {
+					from: "spendings",
+					localField: "_id",
+					foreignField: "category",
+					as: "categories",
+				},
+			},
+			{
+				$project: {
+					name: 1,
+					objective: 1,
+					totalSpending: {
+						$sum: "$categories.amount",
+					},
+				},
+			},
+		]);
+		console.log("cat = ", category);
+		res.status(200).json(category[0]);
+	} catch {
 		res.status(500).json("An error occured ...");
 	}
 });

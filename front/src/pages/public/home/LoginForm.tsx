@@ -104,6 +104,7 @@ const LoginForm = () => {
 							payload: event.target.value,
 						});
 					}}
+					data-cy="username"
 				/>
 				<TextField
 					variant="standard"
@@ -118,6 +119,7 @@ const LoginForm = () => {
 							payload: event.target.value,
 						});
 					}}
+					data-cy="password"
 				/>
 				{/* <FormControlLabel
 						control={<Checkbox name="checked" color="primary" />}

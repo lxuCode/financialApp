@@ -37,17 +37,17 @@ const styles = {
 		fontSize: "14px",
 	},
 };
-const CategoryPaper = () => {
+const CategoryPaper = ({ category }) => {
 	return (
 		<Box sx={styles.wrapper}>
 			<DeleteIcon sx={styles.icons} />
 			<Paper sx={styles.paper}>
 				<Box sx={styles.left}>
-					<span style={styles.mainInfo}>Catégorie</span>
+					<span style={styles.mainInfo}>{category.name}</span>
 					<span style={styles.secondaryInfo}>Objectif: moins de 3 3500€</span>
 				</Box>
 				<Box sx={styles.right}>
-					<span style={styles.mainInfo}>3 000€</span>
+					<span style={styles.mainInfo}>{category.totalSpending} €</span>
 					<span style={styles.secondaryInfo}>
 						dépensés depuis le début du mois
 					</span>
